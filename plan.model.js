@@ -6,6 +6,8 @@ const PlanSchema = new Schema({
     location: String,
     date: String,
     time: String
+}, {
+    versionKey: false
 })
 
 mongoose.model('plan', PlanSchema)
