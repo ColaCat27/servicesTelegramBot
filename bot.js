@@ -31,7 +31,7 @@ const getData = new WizardScene('get_data',
             if(err) return console.log(err);
              
             for(let i = 0; i < docs.length; i++) {
-                await ctx.reply(`Описание: ${docs[i].description}\nАдрес: ${docs[i].location}\nДата: ${docs[i].date}`);
+                await ctx.reply(`Описание: ${docs[i].description}\nАдрес: ${docs[i].location}\nДата: ${docs[i].date}\nВремя: ${docs[i].time}`);
             }
             await ctx.reply('Это все услуги доступные сегодня')
         })
@@ -59,10 +59,16 @@ const sendData = new WizardScene('send_data',
     },
     (ctx) => {
         ctx.wizard.state.date = ctx.message.text;
+        ctx.reply('Укажите время когда ваша услуга будет доступна.\nПример: с 10-00 до 12-00');
+        ctx.wizard.next();
+    },
+    (ctx) => {
+        ctx.wizard.state.time = ctx.message.text;
         const plan = new Plan({
             description: ctx.wizard.state.description,
             location: ctx.wizard.state.location,
-            date: ctx.wizard.state.date
+            date: ctx.wizard.state.date,
+            time: ctx.wizard.state.time
         })
 
         plan.save().then(user => {
