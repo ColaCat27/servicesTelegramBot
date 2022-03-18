@@ -6,14 +6,14 @@ const mongoose = require('mongoose')
 require('./plan.model')
 
 mongoose.connect(`mongodb+srv://colacat:${process.env.PASSWORD}@cluster0.z0puw.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`)
-.then(() => console.log('MongoDB has started...'))
-.catch(e => console.log(e))
+    .then(() => console.log('MongoDB has started...'))
+    .catch(e => console.log(e))
 
 const Plan = mongoose.model('plan')
 
 const TOKEN = process.env.TOKEN
 const PORT = process.env.PORT || 5000
-const URL =  process.env.URL
+const URL = process.env.URL
 
 const bot = new Telegraf(TOKEN)
 
@@ -27,16 +27,16 @@ async function getDate() {
     return date;
 }
 
-const getData = new WizardScene('get_data', 
+const getData = new WizardScene('get_data',
     async (ctx) => {
         date = await getDate();
-        Plan.find({date: date}, async (err, docs) => {
+        Plan.find({ date: date }, async (err, docs) => {
             mongoose.disconnect();
-     
-            if(err) return console.log(err);
-             
-            if(docs.length > 0) {
-                for(let i = 0; i < docs.length; i++) {
+
+            if (err) return console.log(err);
+
+            if (docs.length > 0) {
+                for (let i = 0; i < docs.length; i++) {
                     await ctx.reply(`Описание: ${docs[i].description}\nАдрес: ${docs[i].location}\nДата: ${docs[i].date}\nВремя: ${docs[i].time}`);
                 }
                 await ctx.reply('Это все услуги доступные сегодня')
@@ -56,31 +56,31 @@ const sendData = new WizardScene('send_data',
         try {
             ctx.reply('Добавьте описание для своей услуги.\nСтарайтесь максимально понятно описать то что вы хотите предоставить.\nПример: Продажа картошки/муки/чего-угодно. Цена 15грн/кг')
             return ctx.wizard.next();
-        } catch(e) {
+        } catch (e) {
             return ctx.scene.reenter();
         }
     },
     (ctx) => {
         try {
-            if(ctx.message.text.length < 5) {
+            if (ctx.message.text.length < 5) {
                 throw new Error('Введите более подробное описание');
             }
             ctx.wizard.state.description = ctx.message.text;
             ctx.reply('Укажите адрес где вы будете предоставлять услугу')
             return ctx.wizard.next();
-        } catch(e) {
+        } catch (e) {
             return ctx.scene.reenter();
         }
     },
     async (ctx) => {
         try {
-            if(ctx.message.text.length < 0) {
+            if (ctx.message.text.length < 0) {
                 throw new Error();
             }
             ctx.wizard.state.location = ctx.message.text;
             ctx.reply(`Укажите дату когда вы будете предоставлять услугу.\nПример: ${await getDate()}`)
             return ctx.wizard.next();
-        } catch(e) {
+        } catch (e) {
             console.error(e);
             ctx.wizard.selectStep(ctx.wizard.cursor);
             return;
@@ -88,15 +88,15 @@ const sendData = new WizardScene('send_data',
     },
     (ctx) => {
         try {
-            if(ctx.message.text.length < 5) {
+            if (ctx.message.text.length < 5) {
                 throw new Error('Введите дату в правильном формате');
-            } else if(!/\d+\.\d+\.\d+/.test(ctx.message.text)) {
+            } else if (!/\d+\.\d+\.\d+/.test(ctx.message.text)) {
                 throw new Error('Введите дату в правильном формате');
             }
             ctx.wizard.state.date = ctx.message.text;
             ctx.reply('Укажите время когда ваша услуга будет доступна.\nПример: с 10-00 до 12-00');
             return ctx.wizard.next();
-        } catch(e) {
+        } catch (e) {
             ctx.reply(e.message)
             ctx.wizard.selectStep(ctx.wizard.cursor);
             return;
@@ -104,7 +104,7 @@ const sendData = new WizardScene('send_data',
     },
     (ctx) => {
         try {
-            if(ctx.message.text.length < 0) {
+            if (ctx.message.text.length < 0) {
                 throw new Error();
             }
             ctx.wizard.state.time = ctx.message.text;
@@ -114,13 +114,13 @@ const sendData = new WizardScene('send_data',
                 date: ctx.wizard.state.date,
                 time: ctx.wizard.state.time
             })
-    
+
             plan.save().then(user => {
                 ctx.reply('Услуга успешно добавлена')
             }).catch(e => console.log(e))
             mongoose.disconnect();
             ctx.scene.leave();
-        } catch(e) {
+        } catch (e) {
             console.error(e)
             ctx.wizard.selectStep(ctx.wizard.cursor);
             return;
@@ -136,17 +136,17 @@ const stage = new Stage([sendData, getData]);
 bot.use(session());
 bot.use(stage.middleware());
 
-bot.start(async (ctx) => { 
+bot.start(async (ctx) => {
     await ctx.reply('Привет!🌎💙💛\nЭтот чат-бот собирает информацию о доступных услугах в нашем городе.\nКаждый человек может посмотреть или добавить услуги.\nРабота этого чат-бота основана исключительно на вашей порядочности,\nпостарайтесь вносить максимально корректные данные.',
-    {
-        reply_markup: {
-            keyboard: [
-                ['Список услуг', 'Добавить услугу'],
-            ],
-            resize_keyboard: true,
-            one_time_keyboard: true
-        },
-    })
+        {
+            reply_markup: {
+                keyboard: [
+                    ['Список услуг', 'Добавить услугу'],
+                ],
+                resize_keyboard: true,
+                one_time_keyboard: true
+            },
+        })
 })
 
 bot.hears('Список услуг', async (ctx) => {
