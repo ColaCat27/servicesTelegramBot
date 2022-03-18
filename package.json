@@ -17,6 +17,6 @@
   "author": "Tischenko Vladislav (Cola_Cat)",
   "license": "ISC",
   "engines": {
-    "node": ""
+    "node": "16.x"
   }
 }
