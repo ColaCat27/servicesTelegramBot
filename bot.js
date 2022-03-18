@@ -13,8 +13,13 @@ const Plan = mongoose.model('plan')
 
 const TOKEN = process.env.TOKEN
 const PORT = process.env.PORT || 5000
+const URL =  process.env.URL
 
 const bot = new Telegraf(TOKEN)
+
+bot.telegram.setWebhook(`${URL}/bot${TOKEN}`)
+bot.startWebhook(`/bot${TOKEN}`, null, PORT)
+
 async function getDate() {
     let date = new Date().toISOString().split('T')[0].replaceAll('-', '.');
     let dateArray = date.split('.');
