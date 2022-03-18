@@ -117,7 +117,6 @@ const sendData = new WizardScene('send_data',
 
             plan.save().then(user => {
                 ctx.reply('Услуга успешно добавлена')
-                mongoose.disconnect();
             }).catch(e => console.log(e))
             ctx.scene.leave();
         } catch (e) {
