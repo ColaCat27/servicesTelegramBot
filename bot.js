@@ -31,7 +31,6 @@ const getData = new WizardScene('get_data',
     async (ctx) => {
         date = await getDate();
         Plan.find({ date: date }, async (err, docs) => {
-            mongoose.disconnect();
 
             if (err) return console.log(err);
 
