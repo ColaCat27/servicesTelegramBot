@@ -12,6 +12,7 @@ mongoose.connect(`mongodb+srv://colacat:${process.env.PASSWORD}@cluster0.z0puw.m
 const Plan = mongoose.model('plan')
 
 const TOKEN = process.env.TOKEN
+const PORT = process.env.PORT || 5000
 
 const bot = new Telegraf(TOKEN)
 async function getDate() {
