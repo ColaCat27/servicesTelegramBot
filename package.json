@@ -12,7 +12,7 @@
   "description": "Дізнайся про магазини які зараз працюють у твоєму місті",
   "main": "bot.js",
   "scripts": {
-    "start": "nodemon bot.js"
+    "start": "node bot.js"
   },
   "author": "Tischenko Vladislav (Cola_Cat)",
   "license": "ISC",
