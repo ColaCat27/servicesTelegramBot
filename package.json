@@ -15,5 +15,8 @@
     "start": "nodemon bot.js"
   },
   "author": "Tischenko Vladislav (Cola_Cat)",
-  "license": "ISC"
+  "license": "ISC",
+  "engines": {
+    "node": ""
+  }
 }
