@@ -5,7 +5,7 @@ const mongoose = require('mongoose')
 
 require('./plan.model')
 
-mongoose.connect('mongodb://localhost:27017/beryslav')
+mongoose.connect(`mongodb+srv://colacat:${process.env.PASSWORD}@cluster0.z0puw.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`)
 .then(() => console.log('MongoDB has started...'))
 .catch(e => console.log(e))
 
