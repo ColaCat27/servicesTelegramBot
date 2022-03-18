@@ -31,7 +31,7 @@ const getData = new WizardScene('get_data',
     async (ctx) => {
         date = await getDate();
         Plan.find({date: date}, async (err, docs) => {
-            //mongoose.disconnect();
+            mongoose.disconnect();
      
             if(err) return console.log(err);
              
@@ -118,7 +118,7 @@ const sendData = new WizardScene('send_data',
             plan.save().then(user => {
                 ctx.reply('Услуга успешно добавлена')
             }).catch(e => console.log(e))
-    
+            mongoose.disconnect();
             ctx.scene.leave();
         } catch(e) {
             console.error(e)
