@@ -155,7 +155,6 @@ bot.hears('Список услуг', async (ctx) => {
 
 bot.hears('Добавить услугу', async (ctx) => {
     await ctx.scene.enter('send_data')
-    await mongoose.disconnect();
 })
 
 bot.launch()
