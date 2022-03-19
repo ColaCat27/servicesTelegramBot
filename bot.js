@@ -2,6 +2,7 @@ require('dotenv').config()
 
 const { Telegraf, session, Scenes: { WizardScene, Stage } } = require('telegraf')
 const mongoose = require('mongoose')
+const http = require('http')
 
 require('./plan.model')
 
@@ -19,6 +20,11 @@ const bot = new Telegraf(TOKEN)
 
 bot.telegram.setWebhook(`${URL}/bot${TOKEN}`)
 bot.startWebhook(`/bot${TOKEN}`, null, PORT)
+
+
+setInterval(function() {
+    http.get("https://beryslav-info.herokuapp.com/");
+}, 300000); 
 
 async function getDate() {
     let date = new Date().toISOString().split('T')[0].replaceAll('-', '.');
@@ -157,3 +163,6 @@ bot.hears('Добавить услугу', async (ctx) => {
 })
 
 bot.launch()
+
+process.once('SIGINT', () => bot.stop('SIGINT'))
+process.once('SIGTERM', () => bot.stop('SIGTERM'))
