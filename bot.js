@@ -18,8 +18,8 @@ const URL = process.env.URL
 
 const bot = new Telegraf(TOKEN)
 
-// bot.telegram.setWebhook(`${URL}/bot${TOKEN}`)
-// bot.startWebhook(`/bot${TOKEN}`, null, PORT)
+bot.telegram.setWebhook(`${URL}/bot${TOKEN}`)
+bot.startWebhook(`/bot${TOKEN}`, null, PORT)
 
 
 setInterval(function() {
