@@ -64,7 +64,15 @@ const myPublications = new WizardScene('my_publications',
 
             if (docs.length > 0) {
                 for (let i = 0; i < docs.length; i++) {
-                    await ctx.reply(`Описание: ${docs[i].description}\nАдрес: ${docs[i].location}\nДата: ${docs[i].date}\nВремя: ${docs[i].time}`);
+                    await ctx.reply(`Описание: ${docs[i].description}\nАдрес: ${docs[i].location}\nДата: ${docs[i].date}\nВремя: ${docs[i].time}`, {
+                        reply_markup: {
+                            inline_keyboard: [
+                                [
+                                    { text: 'Удалить', callback_data: `delete ${docs[i]._id}` }
+                                ],
+                            ],
+                        },
+                    });
                 }
                 await ctx.reply('Это все доступные публикации')
             } else {
@@ -191,6 +199,25 @@ bot.hears('Добавить услугу', async (ctx) => {
 
 bot.hears('Мои публикации', async (ctx) => {
     await ctx.scene.enter('my_publications')
+    await ctx.scene.leave()
+})
+
+bot.on('callback_query', async (ctx) => {
+    let id = ctx.update.callback_query.data.split(' ')[1]
+    Publication.deleteOne({ _id: id }, async (err, docs) => {
+
+        if (err) return console.log(err);
+
+        ctx.reply(`Публикая удалена`,{
+            reply_markup: {
+                keyboard: [
+                    ['Список услуг', 'Добавить услугу', 'Мои публикации'],
+                ],
+                resize_keyboard: true,
+                one_time_keyboard: true
+            },
+        })
+    })
 })
 
 bot.launch()
