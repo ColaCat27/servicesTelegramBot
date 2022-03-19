@@ -76,7 +76,7 @@ const myPublications = new WizardScene('my_publications',
                 }
                 await ctx.reply('Это все доступные публикации')
             } else {
-                await ctx.reply('Вы еще не добавили публикации. Для добавления нажмите /start и "Добавить услугу"')
+                await ctx.reply('Вы еще не добавили публикации. Для добавления нажмите "Добавить услугу"')
             }
         })
     },
@@ -213,8 +213,7 @@ bot.on('callback_query', async (ctx) => {
                 keyboard: [
                     ['Список услуг', 'Добавить услугу', 'Мои публикации'],
                 ],
-                resize_keyboard: true,
-                one_time_keyboard: true
+                resize_keyboard: true
             },
         })
     })
