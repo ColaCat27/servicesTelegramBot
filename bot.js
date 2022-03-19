@@ -23,7 +23,7 @@ bot.startWebhook(`/bot${TOKEN}`, null, PORT)
 
 
 setInterval(function() {
-    http.get("https://beryslav-info.herokuapp.com/");
+    http.get("http://beryslav-info.herokuapp.com/");
     console.log('ping')
 }, 300000); 
 
