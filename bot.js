@@ -208,7 +208,7 @@ bot.on('callback_query', async (ctx) => {
 
         if (err) return console.log(err);
 
-        ctx.reply(`Публикая удалена`,{
+        ctx.reply(`Публикация удалена`,{
             reply_markup: {
                 keyboard: [
                     ['Список услуг', 'Добавить услугу', 'Мои публикации'],
