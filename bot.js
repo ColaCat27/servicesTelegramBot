@@ -183,7 +183,7 @@ bot.start(async (ctx) => {
                     ['Список услуг', 'Добавить услугу', 'Мои публикации'],
                 ],
                 resize_keyboard: true,
-                one_time_keyboard: true
+                one_time_keyboard: false
             },
         })
 })
