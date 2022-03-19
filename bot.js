@@ -4,13 +4,13 @@ const { Telegraf, session, Scenes: { WizardScene, Stage } } = require('telegraf'
 const mongoose = require('mongoose')
 const http = require('http')
 
-require('./plan.model')
+require('./publication.model')
 
 mongoose.connect(`mongodb+srv://colacat:${process.env.PASSWORD}@cluster0.z0puw.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`)
     .then(() => console.log('MongoDB has started...'))
     .catch(e => console.log(e))
 
-const Plan = mongoose.model('plan')
+const Publication = mongoose.model('publication')
 
 const TOKEN = process.env.TOKEN
 const PORT = process.env.PORT || 5000
@@ -18,8 +18,8 @@ const URL = process.env.URL
 
 const bot = new Telegraf(TOKEN)
 
-bot.telegram.setWebhook(`${URL}/bot${TOKEN}`)
-bot.startWebhook(`/bot${TOKEN}`, null, PORT)
+// bot.telegram.setWebhook(`${URL}/bot${TOKEN}`)
+// bot.startWebhook(`/bot${TOKEN}`, null, PORT)
 
 
 setInterval(function() {
@@ -37,7 +37,7 @@ async function getDate() {
 const getData = new WizardScene('get_data',
     async (ctx) => {
         date = await getDate();
-        Plan.find({ date: date }, async (err, docs) => {
+        Publication.find({ date: date }, async (err, docs) => {
 
             if (err) return console.log(err);
 
@@ -56,6 +56,27 @@ const getData = new WizardScene('get_data',
     }
 )
 
+const myPublications = new WizardScene('my_publications', 
+    async (ctx) => {
+        Publication.find({ telegram_id: ctx.message.chat.id }, async (err, docs) => {
+
+            if (err) return console.log(err);
+
+            if (docs.length > 0) {
+                for (let i = 0; i < docs.length; i++) {
+                    await ctx.reply(`Описание: ${docs[i].description}\nАдрес: ${docs[i].location}\nДата: ${docs[i].date}\nВремя: ${docs[i].time}`);
+                }
+                await ctx.reply('Это все доступные публикации')
+            } else {
+                await ctx.reply('Вы еще не добавили публикации. Для добавления нажмите /start и "Добавить услугу"')
+            }
+        })
+    },
+    (ctx) => {
+        ctx.scene.leave();
+    }
+)
+
 
 const sendData = new WizardScene('send_data',
     (ctx) => {
@@ -63,10 +84,11 @@ const sendData = new WizardScene('send_data',
             ctx.reply('Добавьте описание для своей услуги.\nСтарайтесь максимально понятно описать то что вы хотите предоставить.\nПример: Продажа картошки/муки/чего-угодно. Цена 15грн/кг')
             return ctx.wizard.next();
         } catch (e) {
-            return ctx.scene.reenter();
+            return ctx.scene.reenter()
         }
     },
     (ctx) => {
+        console.log(ctx.message.chat);
         try {
             if (ctx.message.text.length < 5) {
                 throw new Error('Введите более подробное описание');
@@ -114,14 +136,18 @@ const sendData = new WizardScene('send_data',
                 throw new Error();
             }
             ctx.wizard.state.time = ctx.message.text;
-            const plan = new Plan({
+            const publication = new Publication({
                 description: ctx.wizard.state.description,
                 location: ctx.wizard.state.location,
                 date: ctx.wizard.state.date,
-                time: ctx.wizard.state.time
+                time: ctx.wizard.state.time,
+                telegram_id: ctx.message.chat.id,
+                first_name: ctx.message.chat.first_name || "",
+                last_name: ctx.message.chat.last_name || "",
+                username: ctx.message.chat.username || ""
             })
 
-            plan.save().then(user => {
+            publication.save().then(user => {
                 ctx.reply('Услуга успешно добавлена')
             }).catch(e => console.log(e))
             ctx.scene.leave();
@@ -136,7 +162,7 @@ const sendData = new WizardScene('send_data',
 bot.help((ctx) => ctx.reply('С помощью бота можно узнать какие услуги сейчас есть в нашем городе 🏪'))
 bot.on('sticker', (ctx) => ctx.reply('🌎💙💛'))
 
-const stage = new Stage([sendData, getData]);
+const stage = new Stage([sendData, getData, myPublications]);
 
 bot.use(session());
 bot.use(stage.middleware());
@@ -146,7 +172,7 @@ bot.start(async (ctx) => {
         {
             reply_markup: {
                 keyboard: [
-                    ['Список услуг', 'Добавить услугу'],
+                    ['Список услуг', 'Добавить услугу', 'Мои публикации'],
                 ],
                 resize_keyboard: true,
                 one_time_keyboard: true
@@ -161,6 +187,10 @@ bot.hears('Список услуг', async (ctx) => {
 
 bot.hears('Добавить услугу', async (ctx) => {
     await ctx.scene.enter('send_data')
+})
+
+bot.hears('Мои публикации', async (ctx) => {
+    await ctx.scene.enter('my_publications')
 })
 
 bot.launch()
