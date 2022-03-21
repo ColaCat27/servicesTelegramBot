@@ -52,7 +52,7 @@ const getData = new WizardScene('get_data',
         })
     },
     (ctx) => {
-        ctx.scene.leave();
+        return ctx.scene.leave();
     }
 )
 
@@ -81,7 +81,7 @@ const myPublications = new WizardScene('my_publications',
         })
     },
     (ctx) => {
-        ctx.scene.leave();
+       return ctx.scene.leave();
     }
 )
 
